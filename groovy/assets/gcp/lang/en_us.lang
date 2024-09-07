@@ -5,6 +5,7 @@ recipemap.greenhouse.name=Greenhouse
 # MetaTileEntities
 gcp.machine.greenhouse.name=Greenhouse
 gcp.machine.greenhouse.tooltip=Plant Growth Simulator
+gcp.material.desh=Desh
 
 # Tooltips
 gcp.ae2.channels.disabled=Channels are §cdisabled§7.
