@@ -1348,3 +1348,6 @@ recipemap('assembler').recipeBuilder()
         .inputs(item('appliedenergistics2:material', 24) * 2)
         .outputs(item('threng:big_assembler'))
         .duration(200).EUt(120).buildAndRegister()
+// Hide categories
+mods.jei.category.remove('appliedenergistics2.grinder')
+mods.jei.category.remove('appliedenergistics2.inscriber')

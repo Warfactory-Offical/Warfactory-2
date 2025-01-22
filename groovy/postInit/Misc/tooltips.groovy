@@ -25,14 +25,14 @@ event_manager.listen { ItemTooltipEvent event ->
     if (hasChannels) {
         for (item in channels_list) {
             if (stack.isItemEqual(item)) {
-                tooltip.add(net.minecraft.client.resources.I18n.format("gcp.ae2.channels.enabled"))
+                tooltip.add(net.minecraft.client.resources.I18n.format("wf2.ae2.channels.enabled"))
                 break
             }
         }
     } else {
         for (item in channels_list) {
             if (stack.isItemEqual(item)) {
-                tooltip.add(net.minecraft.client.resources.I18n.format("gcp.ae2.channels.disabled"))
+                tooltip.add(net.minecraft.client.resources.I18n.format("wf2.ae2.channels.disabled"))
                 break
             }
         }

@@ -90,13 +90,5 @@ recipemap('assembler').recipeBuilder()
         .duration(40)
         .EUt(128).buildAndRegister();
 
-// Heat Exchanger
-crafting.remove('gregtech:heat_exchanger')
-crafting.shapedBuilder().name('heat_exchanger')
-        .output(metaitem('heat_exchanger'))
-        .matrix('GGG', 'HPH', 'GGG')
-        .key('G', item('gregtech:metal_casing', 4))
-        .key('P', item('gregtech:meta_item_1', 516))
-        .key('H', item('gregtech:fluid_pipe_large', 324))
-        .register()
+
 
