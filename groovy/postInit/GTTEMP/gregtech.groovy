@@ -89,3 +89,6 @@ recipemap('assembler').recipeBuilder()
         .outputs(item('gregtech:cleanroom_casing') * 4)
         .duration(40)
         .EUt(128).buildAndRegister();
+
+
+
