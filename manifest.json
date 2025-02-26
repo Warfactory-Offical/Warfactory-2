@@ -43,26 +43,6 @@
             "required": true
         },
         {
-            "projectID": 367831,
-            "fileID": 3543884,
-            "required": true
-        },
-        {
-            "projectID": 910715,
-            "fileID": 6182667,
-            "required": true
-        },
-        {
-            "projectID": 232131,
-            "fileID": 2624732,
-            "required": true
-        },
-        {
-            "projectID": 409087,
-            "fileID": 6215595,
-            "required": true
-        },
-        {
             "clientOnly": true,
             "projectID": 250398,
             "fileID": 5408385,
