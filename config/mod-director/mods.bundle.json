@@ -20,6 +20,12 @@
             "url": "https://github.com/Synthitic/GCYL-CEu/releases/download/0.1.0-beta-testing/gregtech-1.12.2-2.9.0-beta.jar"
         },
         {
+            "url": "https://github.com/CleanroomMC/ModularUI/releases/download/v2.5.0-rc4/modularui-2.5.0-rc4.jar"
+        },
+        {
+            "url": "https://github.com/CleanroomMC/GroovyScript/releases/download/v1.2.0-hotfix1/groovyscript-1.2.0-hotfix1.jar"
+        },
+        {
             "url": "https://github.com/Synthitic/GCYL-CEu/releases/download/0.1.0-beta-testing/GregicalityMultiblocks-1.3.jar"
         }
     ]
