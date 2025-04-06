@@ -4,6 +4,7 @@
 """build client & server bundles"""
 
 import argparse
+import contextlib
 import hashlib
 import json
 import requests
@@ -37,6 +38,7 @@ basePath = pathlib.Path(os.path.normpath(os.path.realpath(__file__)[:-7] + "..")
 BUILD_OUT_PATH = basePath / "buildOut"
 MODS_PATH = basePath / "mods"
 MANIFEST_PATH = basePath / "manifest.json"
+README_SERVER_PATH = basePath / "README_SERVER.md"
 
 CACHE_PATH = pathlib.Path(BUILD_OUT_PATH / "modcache")
 CLIENT_PATH = BUILD_OUT_PATH / "client"
@@ -49,9 +51,8 @@ CLIENT_OVERRIDES_PATH = CLIENT_PATH / "overrides"
 
 def build(args):
     modlist = []
-    copyDirs = ["scripts", "resources", "config",
-                "/mods", "/structures", "/groovy"]
-    serverCopyDirs = ["/scripts", "/config", "/mods", "/structures", "/groovy"]
+    copyDirs = ["scripts", "resources", "config", "mods", "structures", "groovy"]
+    serverCopyDirs = ["scripts", "config", "mods", "structures", "groovy"]
 
     if args.clean:
         shutil.rmtree(CLIENT_OVERRIDES_PATH, ignore_errors=True)
@@ -99,24 +100,21 @@ def build(args):
                 if str(mod_hash) == mod["hash"]:
                     jar.write(r.content)
                     modlist.append(mod["name"])
-                    print("hash succsessful for {}".format(mod["name"]))
+                    print("hash successful for {}".format(mod["name"]))
                     break
                 else:
-                    print("hash unsuccsessful for {}".format(mod["name"]))
-                    print("use", str(mod_hash), "this if it is consistant across runs")
-                    pass
+                    print("hash unsuccessful for {}".format(mod["name"]))
+                    print("use", str(mod_hash), "this if it is consistent across runs")
 
     for directory in copyDirs:
         print(f"copying {basePath / directory} to {CLIENT_OVERRIDES_PATH / directory}")
-        shutil.copytree(basePath / directory, CLIENT_OVERRIDES_PATH / directory, dirs_exist_ok=True)
+        with contextlib.suppress(FileNotFoundError):
+            shutil.copytree(basePath / directory, CLIENT_OVERRIDES_PATH / directory, dirs_exist_ok=True)
     print(f"directories copied to {CLIENT_PATH}")
 
-    #archive = str(CLIENT_PATH) todo: check this out
-    archive = "buildOut/client"
-    if sha:
-        archive = f"{archive}-{sha}"
-    shutil.copy(MANIFEST_PATH, CLIENT_PATH / manifest.json)
-    shutil.make_archive(archive, "zip", CLIENT_PATH)
+    archive =  BUILD_OUT_PATH / "client"
+    shutil.copy(MANIFEST_PATH, CLIENT_PATH / "manifest.json")
+    shutil.make_archive(f"{archive}-{sha}" if sha else str(archive), "zip", CLIENT_PATH)
     print(f'client zip "{archive}.zip" made')
     print("Finished building client.")
 
@@ -125,10 +123,9 @@ def build(args):
         return
 
     mods_to_manually_download = []
-    headers = {'Accept': 'application/json',
-               'x-api-key': os.getenv("CFAPIKEY")} # todo: remove this key, since its not needed
+    headers = {'Accept': 'application/json'}
     for mod in manifest["files"]:
-        curse_forge_mod_url = f"https://api.curseforge.com/v1/mods/{mod['project_id']}"
+        curse_forge_mod_url = f"https://api.curseforge.com/v1/mods/{mod['projectID']}"
         download_url = f"{curse_forge_mod_url}/files/{mod['fileID']}/download-url"
         r = requests.get(download_url, headers=headers)
         try:
@@ -169,10 +166,12 @@ def build(args):
     print("modlist.html done")
 
     shutil.copy(MANIFEST_PATH, SERVER_PATH / "manifest.json")
-    shutil.copy(basePath / "/LICENSE", SERVER_PATH / "LICENSE")
-    shutil.copy(basePath / "/launch.sh", SERVER_PATH / "launch.sh")
+    shutil.copy(basePath / "LICENSE", SERVER_PATH / "LICENSE")
+    shutil.copy(basePath / "launch.sh", SERVER_PATH / "launch.sh")
     for directory in serverCopyDirs:
-        shutil.copytree(basePath / directory, SERVER_PATH / directory)
+        print(f"copying {basePath / directory} to {SERVER_PATH / directory}")
+        with contextlib.suppress(FileNotFoundError):
+            shutil.copytree(basePath / directory, SERVER_PATH / directory)
     print("directories copied to buildOut/server")
 
     for mod in modlist:
@@ -219,10 +218,10 @@ def build(args):
     subprocess.run(["java", "-jar", "forge-installer.jar", "--installServer"], cwd=SERVER_PATH)
     print("Forge Installed")
 
-    if len(mods_to_manually_download) != 0 or os.path.exists(basePath / "README_SERVER.md"):
+    if len(mods_to_manually_download) != 0 or os.path.exists(README_SERVER_PATH):
         with open(SERVER_PATH / "README_SERVER.md", "w") as f:
-            if os.path.exists(basePath / "README_SERVER.md"):
-                with open(basePath / "/README_SERVER.md") as g:
+            if os.path.exists(README_SERVER_PATH):
+                with open(README_SERVER_PATH) as g:
                     f.write(g.read())
             if len(mods_to_manually_download) != 0:
                 f.write("\n# YOU NEED TO MANUALLY DOWNLOAD THESE MODS\n")
@@ -238,10 +237,8 @@ def build(args):
     except Exception as e:
         print(f"Couldn't delete forge-installer.jar.log: {e}")
 
-    archive = "buildOut/server" # todo: check this out
-    if sha:
-        archive = "%s-%s" % (archive, sha)
-    shutil.make_archive(archive, "zip", SERVER_PATH)
+    archive = BUILD_OUT_PATH / "server"
+    shutil.make_archive(f"{archive}-{sha}" if sha else str(archive), "zip", SERVER_PATH)
     print(f"server zip '{archive}.zip' made")
 
     if args.dev_build:
