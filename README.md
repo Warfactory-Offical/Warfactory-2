@@ -1,13 +1,10 @@
-# GregTech-Community-Pack
+# Warfactory 2
 
-Repository for the GregTech Community Modpack - a minecraft modpack for 1.12.2 highlighting and featuring [GregTech Community Edition Unofficial](https://github.com/GregTechCEu/GregTech).
+Repository for the Warfactory 2 Modpack, go to the discord as not much is here atm https://discord.gg/ker7z7KCf2
 
 ## Playing
 
-The modpack is available on [Curseforge](https://www.curseforge.com/minecraft/modpacks/gregtech-community-pack).
-
-To play with the latest commits, go to [Releases](https://github.com/GregTechCEu/GregTech-Community-Pack/releases) and download `client.zip`.
-Drag and drop the archive file into the launcher of your choice that supports Curseforge.
+The pack is technically playable but it's not really suitable for survival atm, if you want to play it go build the pack you skid
 
 ## Building
 
@@ -15,4 +12,5 @@ You need `Python3` and `Python Requests` installed. Building is done through run
 
 ## Credits
 
-Build Scripts by [htmlcsjs](https://github.com/htmlcsjs).
+deez ppl https://www.curseforge.com/minecraft/modpacks/gregtech-community-pack
+this guy also helped https://legacy.curseforge.com/minecraft/modpacks/modernized-1-12
