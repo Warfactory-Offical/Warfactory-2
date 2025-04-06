@@ -49,24 +49,29 @@ SERVER_VANILLA_MINECRAFT_JAR_PATH = SERVER_PATH / "minecraft_server.1.12.2.jar"
 
 CLIENT_OVERRIDES_PATH = CLIENT_PATH / "overrides"
 
+def clean_build():
+    shutil.rmtree(CLIENT_OVERRIDES_PATH, ignore_errors=True)
+    shutil.rmtree(SERVER_PATH, ignore_errors=True)
+    shutil.rmtree(MODS_PATH, ignore_errors=True)
+
+def compute_commit_hash():
+    compute_sha = ["git", "rev-parse", "--short", "HEAD"]
+    p = subprocess.run(compute_sha, capture_output=True, cwd=basePath)
+    if p.returncode != 0:
+        raise ValueError(f"Commit hash could not be computed using `{' '.join(compute_sha)}`")
+    return p.stdout.strip().decode("utf-8")
+
 def build(args):
     modlist = []
-    copyDirs = ["scripts", "resources", "config", "mods", "structures", "groovy"]
-    serverCopyDirs = ["scripts", "config", "mods", "structures", "groovy"]
+    client_dirs_to_copy = ["scripts", "resources", "config", "mods", "structures", "groovy"]
+    server_dirs_to_copy = ["scripts", "config", "mods", "structures", "groovy"]
 
     if args.clean:
-        shutil.rmtree(CLIENT_OVERRIDES_PATH, ignore_errors=True)
-        shutil.rmtree(SERVER_PATH, ignore_errors=True)
-        shutil.rmtree(MODS_PATH, ignore_errors=True)
-        sys.exit(0)
+        return clean_build()
+
     sha = ""
     if args.sha:
-        try:
-            p = subprocess.run(
-                ["git", "rev-parse", "--short", "HEAD"], capture_output=True, cwd=basePath)
-            sha = p.stdout.strip().decode("utf-8")
-        except Exception as e:
-            print("could not determine git sha, skipping")
+        sha = compute_commit_hash()
 
     with open(MANIFEST_PATH) as file:
         manifest = json.load(file)
@@ -106,7 +111,7 @@ def build(args):
                     print("hash unsuccessful for {}".format(mod["name"]))
                     print("use", str(mod_hash), "this if it is consistent across runs")
 
-    for directory in copyDirs:
+    for directory in client_dirs_to_copy:
         print(f"copying {basePath / directory} to {CLIENT_OVERRIDES_PATH / directory}")
         with contextlib.suppress(FileNotFoundError):
             shutil.copytree(basePath / directory, CLIENT_OVERRIDES_PATH / directory, dirs_exist_ok=True)
@@ -115,12 +120,13 @@ def build(args):
     archive =  BUILD_OUT_PATH / "client"
     shutil.copy(MANIFEST_PATH, CLIENT_PATH / "manifest.json")
     shutil.make_archive(f"{archive}-{sha}" if sha else str(archive), "zip", CLIENT_PATH)
-    print(f'client zip "{archive}.zip" made')
-    print("Finished building client.")
+    print(f"client zip '{archive}.zip' made")
+    print("Finished building client")
 
     if args.client:
         print("Exiting. Since argument for only client build was provided")
         return
+
 
     mods_to_manually_download = []
     headers = {'Accept': 'application/json'}
@@ -148,13 +154,8 @@ def build(args):
         else:
             name = metadata["data"].split("/")[-1]
         url = metadata["data"]
-        clientOnly = False
-        try:
-            clientOnly = mod["clientOnly"]
-        except:
-            clientOnly = False
-
-        modlist.append({"name": name, "url": url, "clientOnly": clientOnly})
+        client_only = mod.get("clientOnly", False)
+        modlist.append({"name": name, "url": url, "clientOnly": client_only})
     print("modlist compiled")
 
     with open(BUILD_OUT_PATH / "modlist.html", "w") as file:
@@ -168,7 +169,7 @@ def build(args):
     shutil.copy(MANIFEST_PATH, SERVER_PATH / "manifest.json")
     shutil.copy(basePath / "LICENSE", SERVER_PATH / "LICENSE")
     shutil.copy(basePath / "launch.sh", SERVER_PATH / "launch.sh")
-    for directory in serverCopyDirs:
+    for directory in server_dirs_to_copy:
         print(f"copying {basePath / directory} to {SERVER_PATH / directory}")
         with contextlib.suppress(FileNotFoundError):
             shutil.copytree(basePath / directory, SERVER_PATH / directory)
@@ -245,7 +246,7 @@ def build(args):
         os.makedirs(BUILD_OUT_PATH / "mmc/minecraft", exist_ok=True)
         shutil.rmtree(BUILD_OUT_PATH / "mmc/minecraft/mods/", ignore_errors=True)
         shutil.copytree(SERVER_MODS_PATH, BUILD_OUT_PATH / "mmc/minecraft/mods/")
-        for directory in copyDirs:
+        for directory in client_dirs_to_copy:
             try:
                 os.symlink(basePath / directory, BUILD_OUT_PATH / "mmc/minecraft/" / directory)
             except Exception:
