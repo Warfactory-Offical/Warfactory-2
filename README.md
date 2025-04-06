@@ -8,7 +8,8 @@ The pack is technically playable, but it's not really suitable for survival atm,
 
 ## Building
 
-To build you will need python3. Run `./build/main.py`
+**Don't forget to add CurseForge api key to environment variables** `export CFAPIKEY=yourkey`.
+To build you will need python3 (dependencies will be resolved in runtime). Run `./build/main.py`
 
 ## Credits
 
