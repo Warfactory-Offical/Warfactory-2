@@ -93,7 +93,7 @@ mods.jei.ingredient.removeAndHide(item('securitycraft:reinforced_acacia_fence_ga
 mods.jei.ingredient.removeAndHide(item('securitycraft:universal_block_reinforcer_lvl1'))
 mods.jei.ingredient.removeAndHide(item('securitycraft:universal_block_reinforcer_lvl2'))
 mods.jei.ingredient.removeAndHide(item('securitycraft:universal_block_reinforcer_lvl3'))
-mods.jei.ingredient.removeAndHide(item('securitycraft:briefcase'))
+//mods.jei.ingredient.removeAndHide(item('securitycraft:briefcase'))
 mods.jei.ingredient.removeAndHide(item('securitycraft:sentry'))
 mods.jei.ingredient.removeAndHide(item('securitycraft:keypad_door_item'))
 mods.jei.ingredient.removeAndHide(item('securitycraft:portable_tune_player'))
