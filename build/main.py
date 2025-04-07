@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
+"""build client & server bundles"""
 
 # if there is a problem with building, please let htmlcsjs or foontinz know
-"""build client & server bundles"""
 
 import argparse
 import contextlib
@@ -22,17 +22,13 @@ from deps import ensure_dependencies
 
 def parse_args():
     parser = argparse.ArgumentParser(prog="build", description=__doc__)
-    parser.add_argument("--sha", action="store_true",
-                        help="append git hash to zips")
-    parser.add_argument("--name", type=str, help="append name to zips")
-    parser.add_argument("--retries", type=int, default=3,
-                        help="download attempts before failure")
-    parser.add_argument("--clean", action="store_true",
-                        help="clean output dirs")
-    parser.add_argument("--dev_build", action="store_true",
-                        help="makes a folder with all the files symlinked for development. probably only works on linux")
-    parser.add_argument("-c", "--client", action="store_true",
-                        help="only builds the client pack")
+
+    parser.add_argument("--sha", action="store_true", help="append git hash to zips")
+    parser.add_argument("--retries", type=int, default=3, help="download attempts before failure")
+    parser.add_argument("--clean", action="store_true",help="clean output dirs")
+    parser.add_argument(
+        "--dev-build", action="store_true", help="makes a folder with all the files symlinked for development. probably only works on linux")
+    parser.add_argument("-c", "--client", action="store_true", help="builds only client pack")
     return parser.parse_args()
 
 CF_API_LINK = "https://api.curseforge.com/v1"
@@ -195,6 +191,21 @@ def copy_dirs(dirs, from_location, target_location):
             )
     print(f"Copied directories: `{dirs}`. From `{from_location}` to `{target_location}`")
 
+def build_for_client(dependencies, client_dirs, archive_name):
+    modlist = download_client_dependencies(dependencies=dependencies, mods_path=MODS_PATH) # todo: they are not client mods, they are both
+    copy_dirs(
+        client_dirs,
+        from_location=basePath,
+        target_location=CLIENT_OVERRIDES_PATH,
+    )
+
+    shutil.copy(MANIFEST_PATH, CLIENT_PATH / "manifest.json")
+    client_archive_path = BUILD_OUT_PATH / archive_name
+    shutil.make_archive(client_archive_path, "zip", CLIENT_PATH)
+    print(f"Archived client to zip at: `{client_archive_path}.zip`")
+    print("Finished building client")
+    return modlist
+
 def build(args):
     modlist = []
     client_dirs_to_copy = ["scripts", "resources", "config", "mods", "structures", "groovy"]
@@ -202,11 +213,7 @@ def build(args):
 
     if args.clean:
         return clear_build()
-
-    sha = ""
-    if args.sha:
-        sha = compute_commit_hash()
-
+    archive_identifier = compute_commit_hash() if getattr(args, "sha", False) else ""
     setup_build_out_folders()
 
     # if we downloaded mods before, add them to the cache
@@ -222,20 +229,15 @@ def build(args):
         print(f"cached {cached} mod downloads in {CACHE_PATH}")
 
     manifest = load_manifest()
-    # download externalDeps from manifest to client
-    modlist.extend(download_client_dependencies(dependencies=manifest["externalDeps"], mods_path=MODS_PATH))
-    copy_dirs(client_dirs_to_copy, from_location=basePath, target_location=CLIENT_OVERRIDES_PATH)
+    client_modlist = build_for_client(
+        manifest["externalDeps"],
+        client_dirs_to_copy,
+        f"client-{archive_identifier}")
+    modlist.extend(client_modlist)
 
-    client_archive_path = BUILD_OUT_PATH / "client"
-    shutil.copy(MANIFEST_PATH, CLIENT_PATH / "manifest.json")
-    shutil.make_archive(f"{client_archive_path}-{sha}" if sha else str(client_archive_path), "zip", CLIENT_PATH)
-    print(f"Archived client to zip at: `{client_archive_path}.zip`")
-
-    print("Finished building client")
     if args.client:
         print("Exiting. Since argument for only client build was provided")
         return
-
 
     save_modlist(modlist, BUILD_OUT_PATH / "modlist.html")
 
@@ -272,6 +274,7 @@ def build(args):
     install_forge_server(SERVER_PATH)
 
     resolved_mods, guidance_for_server_readme_lines = resolve_server_mod_dependencies(manifest["files"])
+    modlist.extend(resolved_mods)
 
     shutil.copy(README_SERVER_PATH, SERVER_PATH)
     if guidance_for_server_readme_lines:
@@ -284,8 +287,8 @@ def build(args):
         os.remove(SERVER_PATH / "forge-installer.jar")
         os.remove(SERVER_PATH / "forge-installer.jar.log")
 
-    server_archive_path = BUILD_OUT_PATH / "server"
-    shutil.make_archive(f"{server_archive_path}-{sha}" if sha else str(server_archive_path), "zip", SERVER_PATH)
+    server_archive_path = f"{BUILD_OUT_PATH / 'server'}{f'-{archive_identifier}' if archive_identifier else ''}"
+    shutil.make_archive(server_archive_path, "zip", SERVER_PATH)
     print(f"Server archive saved at `{server_archive_path}.zip`")
 
     if args.dev_build: # I`m not sure about this.
