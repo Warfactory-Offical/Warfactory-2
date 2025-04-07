@@ -61,11 +61,16 @@ def load_manifest():
     with open(MANIFEST_PATH) as file:
         return json.load(file)
 
-def clear_build():
+def clean_build():
     shutil.rmtree(MMC_MINECRAFT_PATH / "mods", ignore_errors=True)
     shutil.rmtree(CLIENT_OVERRIDES_PATH, ignore_errors=True)
     shutil.rmtree(SERVER_PATH, ignore_errors=True)
     shutil.rmtree(MODS_PATH, ignore_errors=True)
+
+def clean_forge_installer(path):
+    with contextlib.suppress(FileNotFoundError):
+        os.remove(path / "forge-installer.jar")
+        os.remove(path / "forge-installer.jar.log")
 
 def compute_commit_hash():
     compute_sha = ["git", "rev-parse", "--short", "HEAD"]
@@ -191,8 +196,10 @@ def copy_dirs(dirs, from_location, target_location):
             )
     print(f"Copied directories: `{dirs}`. From `{from_location}` to `{target_location}`")
 
-def build_for_client(dependencies, client_dirs, archive_name):
-    modlist = download_client_dependencies(dependencies=dependencies, mods_path=MODS_PATH) # todo: they are not client mods, they are both
+def build_for_client(modlist, client_dirs, archive_suffix):
+    """ Copies files&folders for client. Downloads mods from modlist"""
+
+    modlist = download_client_dependencies(dependencies=modlist, mods_path=MODS_PATH) # todo: they are not client mods, they are both
     copy_dirs(
         client_dirs,
         from_location=basePath,
@@ -200,59 +207,26 @@ def build_for_client(dependencies, client_dirs, archive_name):
     )
 
     shutil.copy(MANIFEST_PATH, CLIENT_PATH / "manifest.json")
-    client_archive_path = BUILD_OUT_PATH / archive_name
-    shutil.make_archive(client_archive_path, "zip", CLIENT_PATH)
+    client_archive_path = BUILD_OUT_PATH / f"client{archive_suffix}"
+    shutil.make_archive(str(client_archive_path), "zip", CLIENT_PATH)
     print(f"Archived client to zip at: `{client_archive_path}.zip`")
     print("Finished building client")
     return modlist
 
-def build(args):
-    modlist = []
-    client_dirs_to_copy = ["scripts", "resources", "config", "mods", "structures", "groovy"]
-    server_dirs_to_copy = ["scripts", "config", "mods", "structures", "groovy"]
-
-    if args.clean:
-        return clear_build()
-    archive_identifier = compute_commit_hash() if getattr(args, "sha", False) else ""
-    setup_build_out_folders()
-
-    # if we downloaded mods before, add them to the cache
-    cached = 0
-    if os.path.isdir(SERVER_MODS_PATH):
-        for mod in os.listdir(SERVER_MODS_PATH):
-            # don't waste time copying mods to the cache that are already there
-            if os.path.exists(CACHE_PATH / mod):
-                continue
-            cached += 1
-            shutil.copy2(SERVER_MODS_PATH / mod, CACHE_PATH / mod)
-    if cached > 0:
-        print(f"cached {cached} mod downloads in {CACHE_PATH}")
-
-    manifest = load_manifest()
-    client_modlist = build_for_client(
-        manifest["externalDeps"],
-        client_dirs_to_copy,
-        f"client-{archive_identifier}")
-    modlist.extend(client_modlist)
-
-    if args.client:
-        print("Exiting. Since argument for only client build was provided")
-        return
-
-    save_modlist(modlist, BUILD_OUT_PATH / "modlist.html")
+def build_for_server(manifest, modlist, server_dirs, archive_suffix):
+    """ Copies files&folders for server. Downloads mods from modlist"""
 
     shutil.copy(MANIFEST_PATH, SERVER_PATH / "manifest.json")
     shutil.copy(basePath / "LICENSE", SERVER_PATH / "LICENSE")
     shutil.copy(basePath / "launch.sh", SERVER_PATH / "launch.sh")
-    copy_dirs(server_dirs_to_copy, from_location=basePath, target_location=SERVER_PATH)
-
+    copy_dirs(server_dirs, from_location=basePath, target_location=SERVER_PATH)
     for mod in modlist:
         mod_url, mod_name = mod["url"], mod["name"]
         jar_name = mod_url.split("/")[-1]
         if mod["clientOnly"]:
             continue
 
-        if os.path.exists(CACHE_PATH / jar_name): # todo decompose
+        if os.path.exists(CACHE_PATH / jar_name):  # todo decompose
             shutil.copy2(CACHE_PATH / jar_name, SERVER_MODS_PATH / jar_name)
             print(f"{mod} loaded from cache")
             continue
@@ -272,6 +246,7 @@ def build(args):
     download_forge_installer(SERVER_PATH, forge_version, mc_version)
     download_mc_vanilla(SERVER_VANILLA_MINECRAFT_JAR_PATH)
     install_forge_server(SERVER_PATH)
+    clean_forge_installer(SERVER_PATH)
 
     resolved_mods, guidance_for_server_readme_lines = resolve_server_mod_dependencies(manifest["files"])
     modlist.extend(resolved_mods)
@@ -283,13 +258,59 @@ def build(args):
             for line in guidance_for_server_readme_lines:
                 f.write(line + "\n")
 
-    with contextlib.suppress(FileNotFoundError):
-        os.remove(SERVER_PATH / "forge-installer.jar")
-        os.remove(SERVER_PATH / "forge-installer.jar.log")
 
-    server_archive_path = f"{BUILD_OUT_PATH / 'server'}{f'-{archive_identifier}' if archive_identifier else ''}"
-    shutil.make_archive(server_archive_path, "zip", SERVER_PATH)
+    server_archive_path = BUILD_OUT_PATH / f"server{archive_suffix}"
+    shutil.make_archive(str(server_archive_path), "zip", SERVER_PATH)
     print(f"Server archive saved at `{server_archive_path}.zip`")
+    print("Finished building server")
+
+
+def build(args):
+    modlist = []
+    client_dirs_to_copy = ["scripts", "resources", "config", "mods", "structures", "groovy"]
+    server_dirs_to_copy = ["scripts", "config", "mods", "structures", "groovy"]
+    manifest = load_manifest()
+
+    # args satisfying
+    if args.clean:
+        return clean_build()
+    if args.sha:
+        archive_suffix = f"-{compute_commit_hash()}"
+    else:
+        archive_suffix = ""
+
+    setup_build_out_folders()
+    # if we downloaded mods before, add them to the cache
+    cached = 0
+    if os.path.isdir(SERVER_MODS_PATH):
+        for mod in os.listdir(SERVER_MODS_PATH):
+            # don't waste time copying mods to the cache that are already there
+            if os.path.exists(CACHE_PATH / mod):
+                continue
+            cached += 1
+            shutil.copy2(SERVER_MODS_PATH / mod, CACHE_PATH / mod)
+    if cached > 0:
+        print(f"cached {cached} mod downloads in {CACHE_PATH}")
+
+    client_modlist = build_for_client(
+        modlist=manifest["externalDeps"],
+        client_dirs=client_dirs_to_copy,
+        archive_suffix=archive_suffix)
+    modlist.extend(client_modlist)
+
+    if args.client:
+        print("Exiting. Since argument for only client build was provided")
+        return
+
+    save_modlist(modlist, BUILD_OUT_PATH / "modlist.html")
+
+    build_for_server(
+        manifest=manifest,
+        modlist=modlist,
+        server_dirs=server_dirs_to_copy,
+        archive_suffix=archive_suffix
+    )
+
 
     if args.dev_build: # I`m not sure about this.
         os.makedirs(MMC_MINECRAFT_PATH, exist_ok=True)
