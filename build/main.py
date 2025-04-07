@@ -58,6 +58,48 @@ def compute_commit_hash():
         raise ValueError(f"Commit hash could not be computed using `{' '.join(compute_sha)}`")
     return p.stdout.strip().decode("utf-8")
 
+def resolve_common_deps(manifest): # todo: add retries
+    resolved_deps = []
+    for mod in manifest["externalDeps"]:
+        resolved_deps.append(
+            {
+                "download_url": mod["url"],
+                "mod_name": mod["name"],
+                "expected_hash": mod["hash"],
+             }
+        )
+    print("External dependencies resolved")
+    return resolved_deps
+
+def resolve_server_deps(manifest):
+    unresolved_mods = []
+    resolved_mods = []
+    for mod in manifest["files"]: # mod is like {"projectID": 1121489, "fileID": 5814089, "required": true}
+        mod_project_id, file_id, is_required = mod["projectID"], mod["fileID"], mod["required"]
+        curse_forge_mod_url = f"{CF_API_LINK}/mods/{mod_project_id}"
+        download_url = f"{curse_forge_mod_url}/files/{file_id}/download-url"
+        try:
+            print(f"Trying to download metadata from {download_url}", end=" ")
+            raise HTTPError("forbidden")
+            response = requests.get(download_url, headers=HEADERS)
+            response.raise_for_status()
+            metadata = json.loads(response.json()) # {"data": "", ...}
+            name = mod.get("name", metadata["data"].split("/")[-1])
+            name = name if name.endswith(".jar") else name + ".jar"
+            url = metadata["data"]
+            resolved_mods.append({"name": name, "url": url, "clientOnly": mod.get("clientOnly", False)})
+            print()
+        except (HTTPError, JSONDecodeError) as e:
+            print(f"Failed. With error: `{e}`")
+            unresolved_mods.append(mod)
+            if is_required:
+                print(f"Exiting. {mod_project_id} is required, but cannot be resolved.")
+                # exit(1)
+            continue
+
+    print("Server modlist resolving finished.")
+    return resolved_mods, unresolved_mods
+
 def download_client_dependencies(dependencies, mods_path): # todo: add retries
     downloaded_mods = []
     for mod in dependencies:
@@ -73,7 +115,7 @@ def download_client_dependencies(dependencies, mods_path): # todo: add retries
                 print(f"Successful checksum for {mod_name}")
             else:
                 print(f"Unsuccessful checksum for {mod_name}. \n {actual_mod_hash} != {expected_mod_hash}")
-    print("Server mods downloading finished")
+    print("Client mods downloading finished")
     return downloaded_mods
 
 def download_forge_installer(path, forge_version, mc_version):
@@ -121,44 +163,6 @@ def save_modlist(modlist, path):
         file.write(data)
     print("modlist.html done")
 
-def resolve_server_mod_dependencies(dependencies):
-    guidance_lines = []
-    mods_resolved = []
-    for mod in dependencies:
-        mod_project_id, file_id = mod["projectID"], mod["fileID"]
-        curse_forge_mod_url = f"{CF_API_LINK}/mods/{mod_project_id}"
-        download_url = f"{curse_forge_mod_url}/files/{file_id}/download-url"
-
-        try:
-            print(f"Trying to download metadata from {download_url}", end=" ")
-            response = requests.get(download_url, headers=HEADERS)
-            response.raise_for_status()
-            metadata = json.loads(response.json())
-            print()
-        except (HTTPError, JSONDecodeError) as e:
-            print(f"Failed. With error: `{e}`")
-            try:
-                print(f"Trying to download metadata from `{curse_forge_mod_url}`.", end=" ")
-                response_by_project = requests.get(curse_forge_mod_url, headers=HEADERS)
-                response_by_project.raise_for_status()
-                data = response_by_project.json()["data"]
-                guidance_lines.append( # genuinely not sure if this is correct. Left as it was
-                    f"https://www.curseforge.com/minecraft/mc-mods/{data['slug']}/files/{file_id}")
-                print()
-            except (HTTPError, JSONDecodeError) as e:
-                print(f"Failed. With error: `{e}`")
-                guidance_lines.append(
-                    f"This is the raw data, CF api isn`t responding: mod_id: `{mod_project_id}`, file_id: `{file_id}`"
-                )
-            continue
-
-        name = mod.get("name", metadata["data"].split("/")[-1])
-        name = name if name.endswith(".jar") else name + ".jar"
-        url = metadata["data"]
-        mods_resolved.append({"name": name, "url": url, "clientOnly": mod.get("clientOnly", False)})
-    print("Server modlist resolved")
-    return mods_resolved, guidance_lines
-
 def copy_dirs_filling_tree(dirs, from_location, target_location):
     """
     Copied dirs from from_location to target_location.
@@ -180,7 +184,7 @@ def copy_files(files, from_location, target_location):
         print(f"copying {file} to {target_location / file}")
         shutil.copyfile(from_location / file, target_location / file)
 
-def build_for_client(modlist, client_dirs, archive_suffix):
+def build_for_client(modlist, client_dirs):
     """ Copies files&folders for client. Downloads mods from modlist"""
 
     os.makedirs(CLIENT_OVERRIDES_PATH, exist_ok=True)
@@ -191,13 +195,23 @@ def build_for_client(modlist, client_dirs, archive_suffix):
         target_location=CLIENT_OVERRIDES_PATH,
     )
     shutil.copy(MANIFEST_PATH, CLIENT_PATH)
-    client_archive_path = BUILD_OUT_PATH / f"client{archive_suffix}"
-    shutil.make_archive(str(client_archive_path), "zip", CLIENT_PATH)
-    print(f"Archived client to zip at: `{client_archive_path}.zip`")
-    print("Finished building client")
     return modlist
 
-def build_for_server(manifest, modlist, server_dirs, archive_suffix):
+def download_mod(mod, target_location):
+    mod_url, mod_name = mod["url"], mod["name"]
+    mod_filename = mod_url.split("/")[-1]
+
+    with open(target_location / mod_filename, "w+b") as jar:
+        try:
+            print(f"Trying to download {mod_name}. From `{mod_url}` to `{target_location}`", end=" ")
+            response = requests.get(mod_url)
+            response.raise_for_status()
+            jar.write(response.content)
+            print()
+        except HTTPError:
+            print(f"Failed to download `{mod_name}`")
+
+def build_for_server(manifest, modlist, server_dirs):
     """ Copies files&folders for server. Downloads mods from modlist"""
 
     os.makedirs(SERVER_PATH, exist_ok=True)
@@ -207,26 +221,13 @@ def build_for_server(manifest, modlist, server_dirs, archive_suffix):
         target_location=SERVER_PATH,
     )
 
-    copy_dirs_filling_tree(server_dirs, from_location=basePath, target_location=SERVER_PATH)
+    copy_dirs_filling_tree(dirs=server_dirs, from_location=basePath, target_location=SERVER_PATH)
     for mod in modlist:
-        mod_url, mod_name = mod["url"], mod["name"]
-        jar_name = mod_url.split("/")[-1]
+        jar_name = mod["url"].split("/")[-1]
         if mod["clientOnly"]:
             continue
-
-        if os.path.exists(CACHE_PATH / jar_name):  # todo decompose
-            shutil.copy2(CACHE_PATH / jar_name, SERVER_MODS_PATH / jar_name)
-            print(f"{mod} loaded from cache")
-            continue
-
-        with open(SERVER_MODS_PATH / jar_name, "w+b") as jar:
-            try:
-                print(f"Trying to download {mod_name}")
-                response = requests.get(mod_url)
-                response.raise_for_status()
-                jar.write(response.content)
-            except HTTPError:
-                print(f"Failed to download {mod_name}")
+        copy_from_cache(filename=jar_name, target_location=SERVER_PATH)
+        download_mod(mod=mod, target_location=SERVER_MODS_PATH)
     print("Server mods downloading finished")
 
     forge_version = manifest["minecraft"]["modLoaders"][0]["id"].split("-")[-1]
@@ -236,25 +237,24 @@ def build_for_server(manifest, modlist, server_dirs, archive_suffix):
     install_forge_server(SERVER_PATH)
     clean_forge_installer(SERVER_PATH)
 
-    resolved_mods, guidance_for_server_readme_lines = resolve_server_mod_dependencies(manifest["files"])
-    modlist.extend(resolved_mods)
-
-    shutil.copy(README_SERVER_PATH, SERVER_PATH)
-    if guidance_for_server_readme_lines:
-        with open(README_SERVER_PATH, "w") as f:
-            f.write("\n# YOU NEED TO MANUALLY DOWNLOAD THESE MODS\n")
-            for line in guidance_for_server_readme_lines:
-                f.write(line + "\n")
-
-
-    server_archive_path = BUILD_OUT_PATH / f"server{archive_suffix}"
-    shutil.make_archive(str(server_archive_path), "zip", SERVER_PATH)
-    print(f"Server archive saved at `{server_archive_path}.zip`")
     print("Finished building server")
 
+def copy_from_cache(filename, target_location):
+    if os.path.exists(CACHE_PATH / filename):
+        shutil.copy2(CACHE_PATH / filename, target_location / filename)
+        print(f"{filename} loaded from cache to {target_location}")
+        return True
+    return False
+
+def create_server_readme(lines):
+    shutil.copy(README_SERVER_PATH, SERVER_PATH)
+    with open(SERVER_PATH / "README_SERVER.MD", "a") as f:
+        f.write("\n# YOU NEED TO MANUALLY DOWNLOAD THESE MODS, THEY COULD NOT BE RESOLVED VIA CFAPI\n")
+        for l in lines:
+            f.write(f"Following mod info: {l}\n")
 
 def build(args):
-    modlist = []
+    modlist = [] # [{"name":"", "url":""}, ...]
     client_dirs_to_copy = ["scripts", "resources", "config", "mods", "structures", "groovy"]
     server_dirs_to_copy = ["scripts", "config", "mods", "structures", "groovy"]
     manifest = load_manifest()
@@ -283,8 +283,12 @@ def build(args):
 
     client_modlist = build_for_client(
         modlist=manifest["externalDeps"],
-        client_dirs=client_dirs_to_copy,
-        archive_suffix=archive_suffix)
+        client_dirs=client_dirs_to_copy
+    )
+    client_archive_path = BUILD_OUT_PATH / f"client{archive_suffix}"
+    shutil.make_archive(str(client_archive_path), "zip", CLIENT_PATH)
+    print(f"Archived client to zip at: `{client_archive_path}.zip`")
+    print("Finished building client")
     modlist.extend(client_modlist)
 
     if args.client:
@@ -293,12 +297,16 @@ def build(args):
 
     save_modlist(modlist, BUILD_OUT_PATH / "modlist.html")
 
+    resolved_server_mods, unresolved_mods = resolve_server_deps(manifest)
     build_for_server(
         manifest=manifest,
-        modlist=modlist,
+        modlist=modlist + resolved_server_mods,
         server_dirs=server_dirs_to_copy,
-        archive_suffix=archive_suffix
     )
+    create_server_readme(unresolved_mods)
+    server_archive_path = BUILD_OUT_PATH / f"server{archive_suffix}"
+    shutil.make_archive(str(server_archive_path), "zip", SERVER_PATH)
+    print(f"Server archive saved at `{server_archive_path}.zip`")
 
     if args.dev_build: # I`m not sure about this.
         os.makedirs(MMC_MINECRAFT_PATH, exist_ok=True)
@@ -337,6 +345,7 @@ LICENSE_FILE_NAME = "LICENSE"
 MANIFEST_FILE_NAME = "manifest.json"
 LAUNCH_SCRIPT_FILENAME = "launch.sh"
 
+# filepaths
 BUILD_OUT_PATH = basePath / "buildOut"
 MODS_PATH = basePath / "mods"
 MANIFEST_PATH = basePath / MANIFEST_FILE_NAME
