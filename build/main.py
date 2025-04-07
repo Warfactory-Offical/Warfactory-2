@@ -31,29 +31,8 @@ def parse_args():
     parser.add_argument("-c", "--client", action="store_true", help="builds only client pack")
     return parser.parse_args()
 
-CF_API_LINK = "https://api.curseforge.com/v1"
-HEADERS = {'Accept': 'application/json', 'x-api-key': os.getenv("CFAPIKEY")}
-
-basePath = pathlib.Path(os.path.normpath(os.path.realpath(__file__)[:-7] + ".."))
-
-BUILD_OUT_PATH = basePath / "buildOut"
-MODS_PATH = basePath / "mods"
-MANIFEST_PATH = basePath / "manifest.json"
-README_SERVER_PATH = basePath / "README_SERVER.md"
-
-CACHE_PATH = pathlib.Path(BUILD_OUT_PATH / "modcache")
-CLIENT_PATH = BUILD_OUT_PATH / "client"
-SERVER_PATH = BUILD_OUT_PATH / "server"
-MMC_MINECRAFT_PATH = BUILD_OUT_PATH / "mmc/minecraft"
-
-SERVER_MODS_PATH = SERVER_PATH / "mods"
-SERVER_VANILLA_MINECRAFT_JAR_PATH = SERVER_PATH / "minecraft_server.1.12.2.jar"
-
-CLIENT_OVERRIDES_PATH = CLIENT_PATH / "overrides"
 
 def setup_build_out_folders():
-    os.makedirs(CLIENT_OVERRIDES_PATH, exist_ok=True)
-    os.makedirs(SERVER_PATH, exist_ok=True)
     os.makedirs(MODS_PATH, exist_ok=True)
     os.makedirs(CACHE_PATH, exist_ok=True)
 
@@ -180,7 +159,7 @@ def resolve_server_mod_dependencies(dependencies):
     print("Server modlist resolved")
     return mods_resolved, guidance_lines
 
-def copy_dirs(dirs, from_location, target_location):
+def copy_dirs_filling_tree(dirs, from_location, target_location):
     """
     Copied dirs from from_location to target_location.
     Suppresses FileNotFoundError. Raises FileExistsError if target_location has dirs
@@ -188,25 +167,30 @@ def copy_dirs(dirs, from_location, target_location):
 
     for directory in dirs:
         print(f"copying {from_location / directory} to {target_location / directory}")
-        with contextlib.suppress(FileNotFoundError):
-            shutil.copytree(
-                from_location / directory,
-                target_location / directory,
-                dirs_exist_ok=True
-            )
+        shutil.copytree(
+            from_location / directory,
+            target_location / directory,
+            dirs_exist_ok=True
+        )
     print(f"Copied directories: `{dirs}`. From `{from_location}` to `{target_location}`")
+
+def copy_files(files, from_location, target_location):
+    """ Copies files from from_location to target_location. Raises FileExistsError/FileNotFoundError"""
+    for file in files:
+        print(f"copying {file} to {target_location / file}")
+        shutil.copyfile(from_location / file, target_location / file)
 
 def build_for_client(modlist, client_dirs, archive_suffix):
     """ Copies files&folders for client. Downloads mods from modlist"""
 
+    os.makedirs(CLIENT_OVERRIDES_PATH, exist_ok=True)
     modlist = download_client_dependencies(dependencies=modlist, mods_path=MODS_PATH) # todo: they are not client mods, they are both
-    copy_dirs(
+    copy_dirs_filling_tree(
         client_dirs,
         from_location=basePath,
         target_location=CLIENT_OVERRIDES_PATH,
     )
-
-    shutil.copy(MANIFEST_PATH, CLIENT_PATH / "manifest.json")
+    shutil.copy(MANIFEST_PATH, CLIENT_PATH)
     client_archive_path = BUILD_OUT_PATH / f"client{archive_suffix}"
     shutil.make_archive(str(client_archive_path), "zip", CLIENT_PATH)
     print(f"Archived client to zip at: `{client_archive_path}.zip`")
@@ -216,10 +200,14 @@ def build_for_client(modlist, client_dirs, archive_suffix):
 def build_for_server(manifest, modlist, server_dirs, archive_suffix):
     """ Copies files&folders for server. Downloads mods from modlist"""
 
-    shutil.copy(MANIFEST_PATH, SERVER_PATH / "manifest.json")
-    shutil.copy(basePath / "LICENSE", SERVER_PATH / "LICENSE")
-    shutil.copy(basePath / "launch.sh", SERVER_PATH / "launch.sh")
-    copy_dirs(server_dirs, from_location=basePath, target_location=SERVER_PATH)
+    os.makedirs(SERVER_PATH, exist_ok=True)
+    copy_files(
+        files=[LICENSE_FILE_NAME, MANIFEST_FILE_NAME, LAUNCH_SCRIPT_FILENAME],
+        from_location=basePath,
+        target_location=SERVER_PATH,
+    )
+
+    copy_dirs_filling_tree(server_dirs, from_location=basePath, target_location=SERVER_PATH)
     for mod in modlist:
         mod_url, mod_name = mod["url"], mod["name"]
         jar_name = mod_url.split("/")[-1]
@@ -253,7 +241,7 @@ def build_for_server(manifest, modlist, server_dirs, archive_suffix):
 
     shutil.copy(README_SERVER_PATH, SERVER_PATH)
     if guidance_for_server_readme_lines:
-        with open(SERVER_PATH / "README_SERVER.md", "w") as f:
+        with open(README_SERVER_PATH, "w") as f:
             f.write("\n# YOU NEED TO MANUALLY DOWNLOAD THESE MODS\n")
             for line in guidance_for_server_readme_lines:
                 f.write(line + "\n")
@@ -280,6 +268,7 @@ def build(args):
         archive_suffix = ""
 
     setup_build_out_folders()
+
     # if we downloaded mods before, add them to the cache
     cached = 0
     if os.path.isdir(SERVER_MODS_PATH):
@@ -311,7 +300,6 @@ def build(args):
         archive_suffix=archive_suffix
     )
 
-
     if args.dev_build: # I`m not sure about this.
         os.makedirs(MMC_MINECRAFT_PATH, exist_ok=True)
         shutil.copytree(SERVER_MODS_PATH, MMC_MINECRAFT_PATH / "mods")
@@ -339,6 +327,30 @@ def build(args):
 
 
 REQUIRED_PACKAGES = ["httpx"]
+CF_API_LINK = "https://api.curseforge.com/v1"
+HEADERS = {'Accept': 'application/json', 'x-api-key': os.getenv("CFAPIKEY")}
+
+basePath = pathlib.Path(os.path.normpath(os.path.realpath(__file__)[:-7] + ".."))
+
+# filenames
+LICENSE_FILE_NAME = "LICENSE"
+MANIFEST_FILE_NAME = "manifest.json"
+LAUNCH_SCRIPT_FILENAME = "launch.sh"
+
+BUILD_OUT_PATH = basePath / "buildOut"
+MODS_PATH = basePath / "mods"
+MANIFEST_PATH = basePath / MANIFEST_FILE_NAME
+README_SERVER_PATH = basePath / "README_SERVER.md"
+
+CACHE_PATH = pathlib.Path(BUILD_OUT_PATH / "modcache")
+CLIENT_PATH = BUILD_OUT_PATH / "client"
+SERVER_PATH = BUILD_OUT_PATH / "server"
+MMC_MINECRAFT_PATH = BUILD_OUT_PATH / "mmc/minecraft"
+
+SERVER_MODS_PATH = SERVER_PATH / "mods"
+SERVER_VANILLA_MINECRAFT_JAR_PATH = SERVER_PATH / "minecraft_server.1.12.2.jar"
+
+CLIENT_OVERRIDES_PATH = CLIENT_PATH / "overrides"
 
 if __name__ == "__main__":
     print("--- BUILD starting ---")
