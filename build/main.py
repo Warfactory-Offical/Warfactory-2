@@ -49,26 +49,25 @@ def compute_commit_hash():
 def resolve_curseforge_deps(dependencies):
     unresolved_mods = []
     resolved_mods = []
-    for dependency in dependencies: # mod is like {"projectID": 1121489, "fileID": 5814089, "required": true}
-        mod_project_id, file_id, is_required = dependency["projectID"], dependency["fileID"], dependency["required"]
+    for dep in dependencies: # dep is like {"projectID": 1121489, "fileID": 5814089, "required": true}
+        mod_project_id, file_id, is_required = dep["projectID"], dep["fileID"], dep["required"]
         curse_forge_mod_url = f"{CF_API_LINK}/mods/{mod_project_id}"
         download_url = f"{curse_forge_mod_url}/files/{file_id}/download-url"
         try:
             print(f"Trying to download metadata from {download_url}", end=" ")
             response = requests.get(download_url, headers=HEADERS)
             response.raise_for_status()
-            metadata = json.loads(response.json()) # {"data": "", ...}
-            name = dependency.get("name", metadata["data"].split("/")[-1])
+            url = response.json()["data"]
+            name = url.split("/")[-1]
             name = name if name.endswith(".jar") else name + ".jar"
-            url = metadata["data"]
-            resolved_mods.append({"name": name, "url": url, "clientOnly": dependency.get("clientOnly", False)})
-            print()
+            resolved_mods.append({"name": name, "url": url, "clientOnly": dep.get("clientOnly", False)})
+            print("Downloaded.")
         except (HTTPError, JSONDecodeError) as e:
             print(f"Failed. With error: `{e}`")
-            unresolved_mods.append(dependency)
+            unresolved_mods.append(dep)
             if is_required:
                 print(f"Exiting. {mod_project_id} is required, but cannot be resolved.")
-                # exit(1)
+                exit(1)
             continue
 
     print("Server modlist resolving finished.")
@@ -175,12 +174,14 @@ def build_for_client(client_dirs):
     )
     shutil.copy(MANIFEST_PATH, CLIENT_PATH)
 
-def download_cf_dependencies(dependencies, target_location):
+def download_cf_dependencies(dependencies, target_location, download_client_mods):
     failed_deps = []
     for dep in dependencies:
         mod_url, mod_name = dep["url"], dep["name"]
         mod_filename = mod_url.split("/")[-1]
-
+        if not download_client_mods:
+            if dep["clientOnly"]:
+                continue
         if copy_from_cache(mod_filename, target_location):
             continue
 
@@ -257,8 +258,8 @@ def build(args):
     if not args.client: # build for server
         resolved_cf_deps, unresolved_cf_deps = resolve_curseforge_deps(manifest["files"])
         cf_and_external_mods.extend(resolved_cf_deps)
-        download_cf_dependencies(dependencies=resolved_cf_deps, target_location=SERVER_MODS_PATH)
         build_for_server(manifest=manifest, server_dirs=server_dirs_to_copy)
+        download_cf_dependencies(dependencies=resolved_cf_deps, target_location=SERVER_MODS_PATH, download_client_mods=False)
         save_modlist(cf_and_external_mods, SERVER_PATH)
         create_server_readme(unresolved_cf_deps)
 
