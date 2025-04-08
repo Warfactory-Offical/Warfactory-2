@@ -50,44 +50,52 @@ def resolve_curseforge_deps(dependencies):
     unresolved_mods = []
     resolved_mods = []
     for dep in dependencies: # dep is like {"projectID": 1121489, "fileID": 5814089, "required": true}
-        mod_project_id, file_id, is_required = dep["projectID"], dep["fileID"], dep["required"]
-        curse_forge_mod_url = f"{CF_API_LINK}/mods/{mod_project_id}"
-        download_url = f"{curse_forge_mod_url}/files/{file_id}/download-url"
-        fallback_url = f"{curse_forge_mod_url}/files/{file_id}/download"
+        mod_project_id, file_id, is_required = dep["projectID"], str(dep["fileID"]), dep["required"]
+        metadata_url = f"{CF_API_URL}/mods/{mod_project_id}/files/{file_id}"
         try:
-            print(f"Trying to download metadata from {download_url}", end=" ")
-            response = requests.get(download_url, headers=HEADERS)
+            print(f"Trying to download metadata from {metadata_url}", end=" ")
+            response = requests.get(metadata_url, headers=HEADERS)
             response.raise_for_status()
-            url = response.json()["data"]
-            name = url.split("/")[-1]
-            name = name if name.endswith(".jar") else name + ".jar"
+            data = response.json()["data"]
+            filename = data["fileName"]
+            url = data.get("downloadUrl", FALLBACK_CDN_TEMPLATE_URL.format(
+                mod=file_id[:3], file_id=int(file_id[3:]), filename=filename)) # int is here to remove leading zeroes
+
             resolved_mods.append(
-                {"name": name, "url": url, "fallback_url" : fallback_url, "clientOnly": dep.get("clientOnly", False)})
-            print("Downloaded.")
-        except (HTTPError, JSONDecodeError) as e:
-            print(f"Failed. With error: `{e}`")
+                {
+                    "name": filename if filename.endswith(".jar") else filename + ".jar",
+                    "url": url,
+                    "clientOnly": dep.get("clientOnly", False)
+                }
+            )
+            print("SUCCESS")
+        except (HTTPError, JSONDecodeError, LookupError) as e:
+            print(f"FAILED. With error: `{e}`")
             unresolved_mods.append(dep)
             if is_required:
                 print(f"Exiting. {mod_project_id} is required, but cannot be resolved.")
-                exit(1)
+                raise
             continue
-
     print("Server modlist resolving finished.")
     return resolved_mods, unresolved_mods
 
-def download_external_deps(dependencies, target_location, check_for_hash): # todo: add retries
+def download_external_deps(dependencies, target_location, check_for_hash, retries):
     downloaded_deps = []
     for mod in dependencies:
         download_url, mod_name, expected_mod_hash = mod["url"], mod["name"], mod["hash"]
-        with open(target_location / download_url.split("/")[-1], "w+b") as jar:
-            response = requests.get(download_url)
-            actual_mod_hash = hashlib.sha256(response.content).hexdigest()
-            if (str(actual_mod_hash) != expected_mod_hash) and check_for_hash:
-                print(f"Unsuccessful checksum for {mod_name}. \n {actual_mod_hash} != {expected_mod_hash}. Exiting, consider removing `--checksum-externals")
-                exit()
+
+        def checksum(content):
+            return hashlib.sha256(content).hexdigest() == expected_mod_hash
+        ok = try_download(
+            url=download_url,
+            path=target_location / download_url.split("/")[-1],
+            retries=retries,
+            checksum_func=checksum if check_for_hash else None)
+        if ok:
             downloaded_deps.append(mod)
-            jar.write(response.content)
-    print("Client mods downloading finished")
+        else:
+             raise Exception(f"Failed to download {mod_name}")
+    print("External deps downloading finished")
     return downloaded_deps
 
 def download_forge_installer(path, forge_version, mc_version):
@@ -176,41 +184,50 @@ def build_for_client(client_dirs):
     )
     shutil.copy(MANIFEST_PATH, CLIENT_PATH)
 
-def download_cf_dependencies(dependencies, target_location, download_client_mods):
+def try_download(url, path, retries, checksum_func=None):
+    """Tries to download from `url` to `path`. Does retries and checksum depending on incoming params"""
+    success = False
+    while retries and not success:
+        with open(path, "w+b") as jar:
+            try:
+                print(f"Trying to download. From `{url}` to `{path}`", end=" ")
+                response = requests.get(url)
+                response.raise_for_status()
+                if checksum_func and checksum_func(response.content):
+                    print(f"Unsuccessful checksum.\n  Consider removing `--checksum-externals")
+                jar.write(response.content)
+                success = True
+                print("SUCCESS")
+            except HTTPError:
+                print(f"FAILED")
+                retries -= 1
+    return success
+
+def download_cf_dependencies(dependencies, target_location, download_client_mods, retries):
     failed_deps = []
     for dep in dependencies:
-        download_url, fallback_download_url, mod_name = dep["url"], dep["name"], dep["fallback_url"]
-        mod_filename = download_url.split("/")[-1]
+        retries_amount = retries
+        download_url, mod_name, mod_filename = (
+            dep["url"],
+            dep["name"],
+            dep["url"].split("/")[-1],
+        )
         if not download_client_mods:
             if dep["clientOnly"]:
                 continue
         if copy_from_cache(mod_filename, target_location):
             continue
 
-        with open(target_location / mod_filename, "w+b") as jar:
-            try:
-                print(f"Trying to download {mod_name}. From `{download_url}` to `{target_location}`", end=" ")
-                response = requests.get(download_url)
-                response.raise_for_status()
-                print()
-            except HTTPError:
-                try:
-                    print(f"Back falling. Trying: `{fallback_download_url}`")
-                    response = requests.get(fallback_download_url)
-                    response.raise_for_status()
-                    print()
-                except HTTPError:
-                    print(f"Failed to download `{mod_name}`")
-                    failed_deps.append(dep)
-                    raise
-            jar.write(response.content)
-            copy_to_cache(target_location / mod_filename)
+        if not try_download(url=download_url, path=target_location / mod_filename, retries=retries_amount):
+            failed_deps.append(dep)
+        copy_to_cache(target_location / mod_filename)
+
     print("Curseforge dependencies downloading finished")
     if failed_deps:
         raise ValueError(f"Failed to download dependencies from CF: {failed_deps}. Exiting")
 
 def build_for_server(manifest, server_dirs):
-    """ Copies files&folders for server. Downloads mods from modlist"""
+    """Copies files&folders for server. Downloads mods from modlist"""
     os.makedirs(SERVER_PATH, exist_ok=True)
     copy_files(
         files=[LICENSE_FILE_NAME, MANIFEST_FILE_NAME, LAUNCH_SCRIPT_FILENAME],
@@ -259,7 +276,11 @@ def build(args):
     setup_build_out_folders()
 
     cf_and_external_mods.extend(download_external_deps(
-        dependencies=manifest["externalDeps"], target_location=MODS_PATH, check_for_hash=args.checksum_externals))
+        dependencies=manifest["externalDeps"],
+        target_location=MODS_PATH,
+        check_for_hash=args.checksum_externals,
+        retries=args.retries
+    ))
     print("External dependencies downloading finished")
 
     build_for_client(client_dirs=client_dirs_to_copy)
@@ -268,7 +289,10 @@ def build(args):
         resolved_cf_deps, unresolved_cf_deps = resolve_curseforge_deps(manifest["files"])
         cf_and_external_mods.extend(resolved_cf_deps)
         build_for_server(manifest=manifest, server_dirs=server_dirs_to_copy)
-        download_cf_dependencies(dependencies=resolved_cf_deps, target_location=SERVER_MODS_PATH, download_client_mods=False)
+        download_cf_dependencies(
+            dependencies=resolved_cf_deps,
+            target_location=SERVER_MODS_PATH,
+            download_client_mods=False, retries=args.retries)
         save_modlist(cf_and_external_mods, SERVER_PATH)
         create_server_readme(unresolved_cf_deps)
 
@@ -311,7 +335,8 @@ def build(args):
 
 
 REQUIRED_PACKAGES = ["requests"]
-CF_API_LINK = "https://api.curseforge.com/v1"
+CF_API_URL = "https://api.curseforge.com/v1"
+FALLBACK_CDN_TEMPLATE_URL = "https://edge.forgecdn.net/files/{mod}/{file_id}/{filename}"
 HEADERS = {'Accept': 'application/json', 'x-api-key': os.getenv("CFAPIKEY")}
 
 basePath = pathlib.Path(os.path.normpath(os.path.realpath(__file__)[:-7] + ".."))
@@ -327,7 +352,7 @@ MODS_PATH = basePath / "mods"
 MANIFEST_PATH = basePath / MANIFEST_FILE_NAME
 README_SERVER_PATH = basePath / "README_SERVER.md"
 
-CACHE_PATH = pathlib.Path(BUILD_OUT_PATH / "modcache")
+CACHE_PATH = BUILD_OUT_PATH / "modcache"
 CLIENT_PATH = BUILD_OUT_PATH / "client"
 SERVER_PATH = BUILD_OUT_PATH / "server"
 MMC_PATH = BUILD_OUT_PATH / "mmc"
