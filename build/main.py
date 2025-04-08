@@ -53,6 +53,7 @@ def resolve_curseforge_deps(dependencies):
         mod_project_id, file_id, is_required = dep["projectID"], dep["fileID"], dep["required"]
         curse_forge_mod_url = f"{CF_API_LINK}/mods/{mod_project_id}"
         download_url = f"{curse_forge_mod_url}/files/{file_id}/download-url"
+        fallback_url = f"{curse_forge_mod_url}/files/{file_id}/download"
         try:
             print(f"Trying to download metadata from {download_url}", end=" ")
             response = requests.get(download_url, headers=HEADERS)
@@ -60,7 +61,8 @@ def resolve_curseforge_deps(dependencies):
             url = response.json()["data"]
             name = url.split("/")[-1]
             name = name if name.endswith(".jar") else name + ".jar"
-            resolved_mods.append({"name": name, "url": url, "clientOnly": dep.get("clientOnly", False)})
+            resolved_mods.append(
+                {"name": name, "url": url, "fallback_url" : fallback_url, "clientOnly": dep.get("clientOnly", False)})
             print("Downloaded.")
         except (HTTPError, JSONDecodeError) as e:
             print(f"Failed. With error: `{e}`")
@@ -177,8 +179,8 @@ def build_for_client(client_dirs):
 def download_cf_dependencies(dependencies, target_location, download_client_mods):
     failed_deps = []
     for dep in dependencies:
-        mod_url, mod_name = dep["url"], dep["name"]
-        mod_filename = mod_url.split("/")[-1]
+        download_url, fallback_download_url, mod_name = dep["url"], dep["name"], dep["fallback_url"]
+        mod_filename = download_url.split("/")[-1]
         if not download_client_mods:
             if dep["clientOnly"]:
                 continue
@@ -187,15 +189,22 @@ def download_cf_dependencies(dependencies, target_location, download_client_mods
 
         with open(target_location / mod_filename, "w+b") as jar:
             try:
-                print(f"Trying to download {mod_name}. From `{mod_url}` to `{target_location}`", end=" ")
-                response = requests.get(mod_url)
+                print(f"Trying to download {mod_name}. From `{download_url}` to `{target_location}`", end=" ")
+                response = requests.get(download_url)
                 response.raise_for_status()
-                jar.write(response.content)
-                copy_to_cache(target_location / mod_filename)
                 print()
             except HTTPError:
-                print(f"Failed to download `{mod_name}`")
-                failed_deps.append(dep)
+                try:
+                    print(f"Back falling. Trying: `{fallback_download_url}`")
+                    response = requests.get(fallback_download_url)
+                    response.raise_for_status()
+                    print()
+                except HTTPError:
+                    print(f"Failed to download `{mod_name}`")
+                    failed_deps.append(dep)
+                    raise
+            jar.write(response.content)
+            copy_to_cache(target_location / mod_filename)
     print("Curseforge dependencies downloading finished")
     if failed_deps:
         raise ValueError(f"Failed to download dependencies from CF: {failed_deps}. Exiting")
