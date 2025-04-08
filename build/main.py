@@ -271,11 +271,11 @@ def build(args):
 
     client_archive_path = BUILD_OUT_PATH / f"client{archive_suffix}"
     shutil.make_archive(str(client_archive_path), "zip", CLIENT_PATH)
+    save_modlist(cf_and_external_mods, CLIENT_PATH)
     print(f"Archived client to zip at: `{client_archive_path}.zip`")
     print("Finished building client")
-    save_modlist(cf_and_external_mods, CLIENT_PATH)
 
-    if args.dev_build: # I`m not sure about this.
+    if args.dev_build: # I`m not sure about this. What we expect to have in buildOut/mmc/ folder ?
         os.makedirs(MMC_MINECRAFT_PATH, exist_ok=True)
         shutil.copytree(SERVER_MODS_PATH, MMC_MINECRAFT_PATH / "mods")
 
@@ -285,20 +285,19 @@ def build(args):
             print(f"Directories copied to {MMC_MINECRAFT_PATH}")
 
         for mod in cf_and_external_mods:
-            jar_name = mod["name"].split("/")[-1]
+            jar_name = mod["name"]
             if not mod["clientOnly"]:
                 continue
-
             with open(MMC_MINECRAFT_PATH / "mods" / jar_name, "w+b") as jar:
                 response = requests.get(mod["url"])
                 jar.write(response.content)
-                print(f"Downloaded :{mod['name']}")
+                print(f"Downloaded :{jar_name}")
 
-        shutil.copy(basePath / "mmc-instance-data.json", BUILD_OUT_PATH / "mmc/mmc-pack.json")
-        instanceFolder = input("What is your MultiMC instance folder:")
-        instanceName = input("What do you want to call the instance:")
-        os.symlink(BUILD_OUT_PATH / "mmc/", instanceFolder + "/" + instanceName)
-        print("you might need to add an instance.cfg for mmc to recognize it")
+        shutil.copy(basePath / "mmc-instance-data.json", MMC_PATH / "mmc-pack.json")
+        instance_dir = pathlib.Path(input("What is your MultiMC instance folder:"))
+        instance_name = input("What do you want to call the instance:")
+        os.symlink(MMC_PATH, instance_dir / instance_name)
+        print("You might need to add an instance.cfg for mmc to recognize it")
 
 
 REQUIRED_PACKAGES = ["requests"]
@@ -321,7 +320,8 @@ README_SERVER_PATH = basePath / "README_SERVER.md"
 CACHE_PATH = pathlib.Path(BUILD_OUT_PATH / "modcache")
 CLIENT_PATH = BUILD_OUT_PATH / "client"
 SERVER_PATH = BUILD_OUT_PATH / "server"
-MMC_MINECRAFT_PATH = BUILD_OUT_PATH / "mmc/minecraft"
+MMC_PATH = BUILD_OUT_PATH / "mmc"
+MMC_MINECRAFT_PATH = MMC_PATH / "minecraft"
 
 SERVER_MODS_PATH = SERVER_PATH / "mods"
 CLIENT_OVERRIDES_PATH = CLIENT_PATH / "overrides"
