@@ -1352,6 +1352,75 @@
             ]
         },
         {
+            "pakku_id": "21zlOzVNlUv7LZ39",
+            "pakku_links": [
+                "LrJeZ0aMNT6NZxEG"
+            ],
+            "type": "MOD",
+            "side": "CLIENT",
+            "slug": {
+                "curseforge": "entityculling",
+                "modrinth": "entityculling"
+            },
+            "name": {
+                "curseforge": "Entity Culling Fabric/Forge",
+                "modrinth": "Entity Culling"
+            },
+            "id": {
+                "curseforge": "448233",
+                "modrinth": "NNAgCjsB"
+            },
+            "redistributable": false,
+            "files": [
+                {
+                    "type": "curseforge",
+                    "file_name": "entityculling-1.12.2-1.6.3.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://edge.forgecdn.net/files/5170/9/entityculling-1.12.2-1.6.3.jar",
+                    "id": "5170009",
+                    "parent_id": "448233",
+                    "hashes": {
+                        "sha1": "fb22f03b297ca7b1bb7c6d5948e46c12e0a24446",
+                        "md5": "11228db94038fa97ddb5c28d47508f2d"
+                    },
+                    "required_dependencies": [
+                        "419286"
+                    ],
+                    "size": 41478,
+                    "date_published": "2024-03-09T20:09:57.363Z"
+                },
+                {
+                    "type": "modrinth",
+                    "file_name": "entityculling-1.12.2-1.6.3.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://cdn.modrinth.com/data/NNAgCjsB/versions/knltv3Vh/entityculling-1.12.2-1.6.3.jar",
+                    "id": "knltv3Vh",
+                    "parent_id": "NNAgCjsB",
+                    "hashes": {
+                        "sha512": "97c4def2a2979a0ba61c0fb016762756cf8361cdff651558dbb91cbe3d8627c388436d31ec2b93ff62df99a7ff589033184db4e6f298f4b8fdd4acf4c83ba202",
+                        "sha1": "fb22f03b297ca7b1bb7c6d5948e46c12e0a24446"
+                    },
+                    "required_dependencies": [
+                        "G1ckZuWK"
+                    ],
+                    "size": 41478,
+                    "date_published": "2024-03-09T20:04:35.562295Z"
+                }
+            ]
+        },
+        {
             "pakku_id": "PxmtPm78cNREOJyD",
             "type": "MOD",
             "slug": {
@@ -1485,6 +1554,67 @@
                     "required_dependencies": [],
                     "size": 10035,
                     "date_published": "2019-05-01T21:29:47.233Z"
+                }
+            ]
+        },
+        {
+            "pakku_id": "gykv5m6KZyb6A0yb",
+            "type": "MOD",
+            "side": "BOTH",
+            "slug": {
+                "curseforge": "fermiumbooter",
+                "modrinth": "fermiumbooter"
+            },
+            "name": {
+                "curseforge": "FermiumBooter",
+                "modrinth": "FermiumBooter"
+            },
+            "id": {
+                "curseforge": "968474",
+                "modrinth": "e00stJKZ"
+            },
+            "files": [
+                {
+                    "type": "curseforge",
+                    "file_name": "`FermiumBooter-1.3.2.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://edge.forgecdn.net/files/6848/644/`FermiumBooter-1.3.2.jar",
+                    "id": "6848644",
+                    "parent_id": "968474",
+                    "hashes": {
+                        "sha1": "d369a982962d8c2cddca97f90ae71ada7f3060d0",
+                        "md5": "523a5b3f47e57b0257fa568f2c82cc90"
+                    },
+                    "required_dependencies": [],
+                    "size": 1924087,
+                    "date_published": "2025-08-04T22:10:53.120Z"
+                },
+                {
+                    "type": "modrinth",
+                    "file_name": "`FermiumBooter-1.3.2.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://cdn.modrinth.com/data/e00stJKZ/versions/CQyTqkXk/`FermiumBooter-1.3.2.jar",
+                    "id": "CQyTqkXk",
+                    "parent_id": "e00stJKZ",
+                    "hashes": {
+                        "sha512": "4e05a39b57a32e55be8272e6877709f94ceea28542bbbc900b67621c033b88b818661c7c43d26ab9c2c82c4ae94edabe1b0aa1611287bff6f39aa26175cee9d0",
+                        "sha1": "d369a982962d8c2cddca97f90ae71ada7f3060d0"
+                    },
+                    "required_dependencies": [],
+                    "size": 1924087,
+                    "date_published": "2025-08-04T22:13:08.071239Z"
                 }
             ]
         },
@@ -2948,6 +3078,74 @@
             ]
         },
         {
+            "pakku_id": "tz1xD8q2zCzvyhVR",
+            "pakku_links": [
+                "gykv5m6KZyb6A0yb"
+            ],
+            "type": "MOD",
+            "side": "SERVER",
+            "slug": {
+                "curseforge": "noisethreader",
+                "modrinth": "noisethreader"
+            },
+            "name": {
+                "curseforge": "NoiseThreader",
+                "modrinth": "NoiseThreader"
+            },
+            "id": {
+                "curseforge": "1153744",
+                "modrinth": "7vujVDby"
+            },
+            "files": [
+                {
+                    "type": "curseforge",
+                    "file_name": "NoiseThreader-1.1.1.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://edge.forgecdn.net/files/6848/878/NoiseThreader-1.1.1.jar",
+                    "id": "6848878",
+                    "parent_id": "1153744",
+                    "hashes": {
+                        "sha1": "abbb515818e51b422616e8e57c59d23eb6596c0a",
+                        "md5": "9867669d99c3b39fbbd1b5fbb8bde92c"
+                    },
+                    "required_dependencies": [
+                        "968474"
+                    ],
+                    "size": 39311,
+                    "date_published": "2025-08-04T23:15:50.553Z"
+                },
+                {
+                    "type": "modrinth",
+                    "file_name": "NoiseThreader-1.1.1.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://cdn.modrinth.com/data/7vujVDby/versions/qlkS2UX9/NoiseThreader-1.1.1.jar",
+                    "id": "qlkS2UX9",
+                    "parent_id": "7vujVDby",
+                    "hashes": {
+                        "sha512": "0b9147f8035397fb8dbf05ade87f9f839041ec76874187417402820de9ea31f27ba4fa25d133eb11176a442723a1917d297e6563461cafa902487e225ed48453",
+                        "sha1": "abbb515818e51b422616e8e57c59d23eb6596c0a"
+                    },
+                    "required_dependencies": [
+                        "e00stJKZ"
+                    ],
+                    "size": 39311,
+                    "date_published": "2025-08-04T23:16:36.524484Z"
+                }
+            ]
+        },
+        {
             "pakku_id": "52zif761QifvELaT",
             "type": "MOD",
             "side": "CLIENT",
@@ -4221,6 +4419,72 @@
                     ],
                     "size": 1619709,
                     "date_published": "2025-09-01T17:57:53.310Z"
+                }
+            ]
+        },
+        {
+            "pakku_id": "623KWzI9RdEqOjmN",
+            "pakku_links": [
+                "LrJeZ0aMNT6NZxEG"
+            ],
+            "type": "MOD",
+            "side": "BOTH",
+            "slug": {
+                "curseforge": "vintagefix",
+                "modrinth": "vintagefix"
+            },
+            "name": {
+                "curseforge": "VintageFix",
+                "modrinth": "VintageFix"
+            },
+            "id": {
+                "curseforge": "871198",
+                "modrinth": "e6vNsbAm"
+            },
+            "files": [
+                {
+                    "type": "curseforge",
+                    "file_name": "vintagefix-0.6.2.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://edge.forgecdn.net/files/6609/247/vintagefix-0.6.2.jar",
+                    "id": "6609247",
+                    "parent_id": "871198",
+                    "hashes": {
+                        "sha1": "eb820c6e58a4d091b80311a28650c7a1b99a1b14",
+                        "md5": "cfedc172905099f24805712852b029a4"
+                    },
+                    "required_dependencies": [
+                        "419286"
+                    ],
+                    "size": 1034861,
+                    "date_published": "2025-06-02T22:22:40.907Z"
+                },
+                {
+                    "type": "modrinth",
+                    "file_name": "vintagefix-0.6.2.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://cdn.modrinth.com/data/e6vNsbAm/versions/sxxcjjGY/vintagefix-0.6.2.jar",
+                    "id": "sxxcjjGY",
+                    "parent_id": "e6vNsbAm",
+                    "hashes": {
+                        "sha512": "1735f89fc7ce84cab76a12f8d0a8ee51934e317b59b168d8ccf6d0fbeab1776c559603c02aba9a8d2e7086233ca2a2503ac73ed01a745f649d67590abcc6dbb0",
+                        "sha1": "eb820c6e58a4d091b80311a28650c7a1b99a1b14"
+                    },
+                    "required_dependencies": [],
+                    "size": 1034861,
+                    "date_published": "2025-06-02T22:22:41.252610Z"
                 }
             ]
         },
