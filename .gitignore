@@ -3,5 +3,6 @@ config/oauth.cfg
 config/AppliedEnergistics2/items.csv
 .DS_Store
 mods/
+build/
 local/
 .idea/
