@@ -482,67 +482,6 @@
             ]
         },
         {
-            "pakku_id": "sgAziowRHOCNGrG7",
-            "type": "MOD",
-            "side": "BOTH",
-            "slug": {
-                "curseforge": "biomes-o-plenty",
-                "modrinth": "biomes-o-plenty"
-            },
-            "name": {
-                "curseforge": "Biomes O' Plenty",
-                "modrinth": "Biomes O' Plenty"
-            },
-            "id": {
-                "curseforge": "220318",
-                "modrinth": "HXF82T3G"
-            },
-            "files": [
-                {
-                    "type": "curseforge",
-                    "file_name": "BiomesOPlenty-1.12.2-7.0.1.2444-universal.jar",
-                    "mc_versions": [
-                        "1.12.2"
-                    ],
-                    "loaders": [
-                        "forge"
-                    ],
-                    "release_type": "beta",
-                    "url": "https://edge.forgecdn.net/files/2842/510/BiomesOPlenty-1.12.2-7.0.1.2444-universal.jar",
-                    "id": "2842510",
-                    "parent_id": "220318",
-                    "hashes": {
-                        "sha1": "6f281febea0746d2229f692cb719bd017ec70b32",
-                        "md5": "4c1d23b8a58b6aaa9a5204fae3f18393"
-                    },
-                    "required_dependencies": [],
-                    "size": 4702147,
-                    "date_published": "2019-12-14T11:25:45.710Z"
-                },
-                {
-                    "type": "modrinth",
-                    "file_name": "BiomesOPlenty-1.12.2-7.0.1.2445-universal.jar",
-                    "mc_versions": [
-                        "1.12.2"
-                    ],
-                    "loaders": [
-                        "forge"
-                    ],
-                    "release_type": "release",
-                    "url": "https://cdn.modrinth.com/data/HXF82T3G/versions/e5wgKLKS/BiomesOPlenty-1.12.2-7.0.1.2445-universal.jar",
-                    "id": "e5wgKLKS",
-                    "parent_id": "HXF82T3G",
-                    "hashes": {
-                        "sha512": "c85959d17da1fd4b3dad3bca55d3baa603c58f795ebfc57e093ddc942ca6b57eee6ea7acede3873598131917999a1cec173cc37092e8180eee473714880f48f2",
-                        "sha1": "13c1e58ffec2a550b9698e25cda93b8d155007b0"
-                    },
-                    "required_dependencies": [],
-                    "size": 4746208,
-                    "date_published": "2023-11-19T08:22:01.812471Z"
-                }
-            ]
-        },
-        {
             "pakku_id": "zkyNcpIhsEU4U4sS",
             "type": "MOD",
             "slug": {
@@ -969,6 +908,27 @@
                 "modrinth": "vPNqo58Q"
             },
             "files": [
+                {
+                    "type": "modrinth",
+                    "file_name": "ClientTweaks_1.12.2-3.1.11.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://cdn.modrinth.com/data/vPNqo58Q/versions/DZ52fdjc/ClientTweaks_1.12.2-3.1.11.jar",
+                    "id": "DZ52fdjc",
+                    "parent_id": "vPNqo58Q",
+                    "hashes": {
+                        "sha512": "3212313cb961150287a760443d3fdafb4baa2324ae1d34d0188cc28b772b68e9b9d0504114aed9230b1da23e13936d8962cdfcb9633fe1dba96da41cbf5d14fb",
+                        "sha1": "c6c31bc3e10fe8da49cb37088ec3d0e8d481ad46"
+                    },
+                    "required_dependencies": [],
+                    "size": 30515,
+                    "date_published": "2025-09-09T05:30:13.934386Z"
+                },
                 {
                     "type": "curseforge",
                     "file_name": "ClientTweaks_1.12.2-3.1.11.jar",
@@ -1414,6 +1374,42 @@
             ]
         },
         {
+            "pakku_id": "ZaJtIPAVpiiF9TaK",
+            "type": "MOD",
+            "slug": {
+                "curseforge": "dynamic-surroundings"
+            },
+            "name": {
+                "curseforge": "Dynamic Surroundings"
+            },
+            "id": {
+                "curseforge": "238891"
+            },
+            "files": [
+                {
+                    "type": "curseforge",
+                    "file_name": "DynamicSurroundings-1.12.2-3.6.3.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "beta",
+                    "url": "https://edge.forgecdn.net/files/3497/269/DynamicSurroundings-1.12.2-3.6.3.jar",
+                    "id": "3497269",
+                    "parent_id": "238891",
+                    "hashes": {
+                        "sha1": "62fc23aa49ba392f4bbeb14ff0aae276ff3a27f4",
+                        "md5": "77e815ce9c8dd68ecba4eb884d6db4d2"
+                    },
+                    "required_dependencies": [],
+                    "size": 15778870,
+                    "date_published": "2021-10-20T18:05:39.843Z"
+                }
+            ]
+        },
+        {
             "pakku_id": "0mJORvqXYDKczQEa",
             "type": "MOD",
             "side": "BOTH",
@@ -1456,7 +1452,6 @@
         {
             "pakku_id": "NMuPsXDTBPFsoPyl",
             "pakku_links": [
-                "sgAziowRHOCNGrG7",
                 "0mJORvqXYDKczQEa"
             ],
             "type": "MOD",
@@ -2113,31 +2108,8 @@
             },
             "files": [
                 {
-                    "type": "curseforge",
-                    "file_name": "Forgelin-Continuous-2.2.0.0.jar",
-                    "mc_versions": [
-                        "1.12.1",
-                        "1.12",
-                        "1.12.2"
-                    ],
-                    "loaders": [
-                        "forge"
-                    ],
-                    "release_type": "release",
-                    "url": "https://edge.forgecdn.net/files/6760/510/Forgelin-Continuous-2.2.0.0.jar",
-                    "id": "6760510",
-                    "parent_id": "456403",
-                    "hashes": {
-                        "sha1": "9d74fb4c826035c2ccc873284b2f4c4f5725bc35",
-                        "md5": "bc573b88f18747237a6231cb1db24e66"
-                    },
-                    "required_dependencies": [],
-                    "size": 7363153,
-                    "date_published": "2025-07-12T16:01:57.340Z"
-                },
-                {
                     "type": "modrinth",
-                    "file_name": "Forgelin-Continuous-2.2.0.0.jar",
+                    "file_name": "Forgelin-Continuous-2.2.20.0.jar",
                     "mc_versions": [
                         "1.12",
                         "1.12.1",
@@ -2147,16 +2119,39 @@
                         "forge"
                     ],
                     "release_type": "release",
-                    "url": "https://cdn.modrinth.com/data/1mPcAmuy/versions/CWKmwkAL/Forgelin-Continuous-2.2.0.0.jar",
-                    "id": "CWKmwkAL",
+                    "url": "https://cdn.modrinth.com/data/1mPcAmuy/versions/xeJ3NGAX/Forgelin-Continuous-2.2.20.0.jar",
+                    "id": "xeJ3NGAX",
                     "parent_id": "1mPcAmuy",
                     "hashes": {
-                        "sha512": "0dc2bdeeb95eac2238498f9c937944efa01307646ec5b97d91644b10362b7f17e1c2b8902a1809ff9f3407d1cc5850e4457c36e4212fe1b871cd82cd1e94cd19",
-                        "sha1": "9d74fb4c826035c2ccc873284b2f4c4f5725bc35"
+                        "sha512": "1dba6748bc5a149107cd0ad7665d6fd9114b4608103c481c96b32e35cc6f6f1fb30a85deb32f056db17c02d30aebb2bf4bccf4d619ca57ebc01e4aedb4a8c200",
+                        "sha1": "064098d130e18a364706f1c4a6c9b27b435acd8a"
                     },
                     "required_dependencies": [],
-                    "size": 7363153,
-                    "date_published": "2025-07-12T15:58:55.317287Z"
+                    "size": 7423721,
+                    "date_published": "2025-09-10T15:52:16.378304Z"
+                },
+                {
+                    "type": "curseforge",
+                    "file_name": "Forgelin-Continuous-2.2.20.0.jar",
+                    "mc_versions": [
+                        "1.12.1",
+                        "1.12",
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://edge.forgecdn.net/files/6983/420/Forgelin-Continuous-2.2.20.0.jar",
+                    "id": "6983420",
+                    "parent_id": "456403",
+                    "hashes": {
+                        "sha1": "064098d130e18a364706f1c4a6c9b27b435acd8a",
+                        "md5": "38202211462ebd7b987c41b892074524"
+                    },
+                    "required_dependencies": [],
+                    "size": 7423721,
+                    "date_published": "2025-09-10T15:51:40.947Z"
                 }
             ]
         },
