@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/Ae2" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Building" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/GTTEMP" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/GlooRot" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Misc" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pvp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Steam Rework" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/processing lines" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
