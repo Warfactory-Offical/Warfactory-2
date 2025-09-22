@@ -482,6 +482,67 @@
             ]
         },
         {
+            "pakku_id": "ICDmrJZ3macQ1r4V",
+            "type": "MOD",
+            "side": "BOTH",
+            "slug": {
+                "curseforge": "biomes-o-plenty",
+                "modrinth": "biomes-o-plenty"
+            },
+            "name": {
+                "curseforge": "Biomes O' Plenty",
+                "modrinth": "Biomes O' Plenty"
+            },
+            "id": {
+                "curseforge": "220318",
+                "modrinth": "HXF82T3G"
+            },
+            "files": [
+                {
+                    "type": "curseforge",
+                    "file_name": "BiomesOPlenty-1.12.2-7.0.1.2444-universal.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "beta",
+                    "url": "https://edge.forgecdn.net/files/2842/510/BiomesOPlenty-1.12.2-7.0.1.2444-universal.jar",
+                    "id": "2842510",
+                    "parent_id": "220318",
+                    "hashes": {
+                        "sha1": "6f281febea0746d2229f692cb719bd017ec70b32",
+                        "md5": "4c1d23b8a58b6aaa9a5204fae3f18393"
+                    },
+                    "required_dependencies": [],
+                    "size": 4702147,
+                    "date_published": "2019-12-14T11:25:45.710Z"
+                },
+                {
+                    "type": "modrinth",
+                    "file_name": "BiomesOPlenty-1.12.2-7.0.1.2445-universal.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://cdn.modrinth.com/data/HXF82T3G/versions/e5wgKLKS/BiomesOPlenty-1.12.2-7.0.1.2445-universal.jar",
+                    "id": "e5wgKLKS",
+                    "parent_id": "HXF82T3G",
+                    "hashes": {
+                        "sha512": "c85959d17da1fd4b3dad3bca55d3baa603c58f795ebfc57e093ddc942ca6b57eee6ea7acede3873598131917999a1cec173cc37092e8180eee473714880f48f2",
+                        "sha1": "13c1e58ffec2a550b9698e25cda93b8d155007b0"
+                    },
+                    "required_dependencies": [],
+                    "size": 4746208,
+                    "date_published": "2023-11-19T08:22:01.812471Z"
+                }
+            ]
+        },
+        {
             "pakku_id": "zkyNcpIhsEU4U4sS",
             "type": "MOD",
             "slug": {
@@ -1452,7 +1513,8 @@
         {
             "pakku_id": "NMuPsXDTBPFsoPyl",
             "pakku_links": [
-                "0mJORvqXYDKczQEa"
+                "0mJORvqXYDKczQEa",
+                "ICDmrJZ3macQ1r4V"
             ],
             "type": "MOD",
             "slug": {
@@ -3834,6 +3896,42 @@
                     "required_dependencies": [],
                     "size": 108444,
                     "date_published": "2019-12-19T17:27:36.863Z"
+                }
+            ]
+        },
+        {
+            "pakku_id": "FRJUG8tNA374C1hV",
+            "type": "MOD",
+            "slug": {
+                "curseforge": "orelib"
+            },
+            "name": {
+                "curseforge": "OreLib"
+            },
+            "id": {
+                "curseforge": "307806"
+            },
+            "files": [
+                {
+                    "type": "curseforge",
+                    "file_name": "OreLib-1.12.2-3.6.0.1.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://edge.forgecdn.net/files/2820/815/OreLib-1.12.2-3.6.0.1.jar",
+                    "id": "2820815",
+                    "parent_id": "307806",
+                    "hashes": {
+                        "sha1": "5debb0481552c54bb6ad72d56b05b31d92e2f5d8",
+                        "md5": "00cce3b240365458adcad3e77782358a"
+                    },
+                    "required_dependencies": [],
+                    "size": 341728,
+                    "date_published": "2019-11-02T17:33:29.310Z"
                 }
             ]
         },
