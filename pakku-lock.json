@@ -2212,29 +2212,8 @@
             },
             "files": [
                 {
-                    "type": "curseforge",
-                    "file_name": "+Fugue-0.20.3.jar",
-                    "mc_versions": [
-                        "1.12.2"
-                    ],
-                    "loaders": [
-                        "forge"
-                    ],
-                    "release_type": "release",
-                    "url": "https://edge.forgecdn.net/files/6950/913/+Fugue-0.20.3.jar",
-                    "id": "6950913",
-                    "parent_id": "1005815",
-                    "hashes": {
-                        "sha1": "a97115d53cf896b7d446cfb59769040c98cb9235",
-                        "md5": "4e39d30185e977d35f8340e0a603a709"
-                    },
-                    "required_dependencies": [],
-                    "size": 275122,
-                    "date_published": "2025-09-01T04:13:17.997Z"
-                },
-                {
                     "type": "modrinth",
-                    "file_name": "+Fugue-0.20.3.jar",
+                    "file_name": "+Fugue-0.20.4.jar",
                     "mc_versions": [
                         "1.12.2"
                     ],
@@ -2242,16 +2221,37 @@
                         "forge"
                     ],
                     "release_type": "release",
-                    "url": "https://cdn.modrinth.com/data/vylTACsh/versions/5dgERPCU/+Fugue-0.20.3.jar",
-                    "id": "5dgERPCU",
+                    "url": "https://cdn.modrinth.com/data/vylTACsh/versions/hMdgksDB/+Fugue-0.20.4.jar",
+                    "id": "hMdgksDB",
                     "parent_id": "vylTACsh",
                     "hashes": {
-                        "sha512": "43a6b43d018033e09950876d54991e88f2c50d3b4485670f5dd53f656707e9a34ff6782a79f5b9393576f5d09da03708a48fe56a969777b69d74c4f5d51f479d",
-                        "sha1": "a97115d53cf896b7d446cfb59769040c98cb9235"
+                        "sha512": "9ca60e6abf4be06479bcba6c6a864c924e90cc7bc7fc71d4a94a4237b6a9eb458aca682176de247a98243bce13a8849ef7b24d49c0f92aceb5b5d8879087a3e1",
+                        "sha1": "b6cc1bedfbd17e2a337bce715c20ccae74ea9dd9"
                     },
                     "required_dependencies": [],
-                    "size": 275122,
-                    "date_published": "2025-09-01T04:13:21.464114Z"
+                    "size": 275202,
+                    "date_published": "2025-09-20T04:43:15.489168Z"
+                },
+                {
+                    "type": "curseforge",
+                    "file_name": "+Fugue-0.20.4.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://edge.forgecdn.net/files/7014/170/+Fugue-0.20.4.jar",
+                    "id": "7014170",
+                    "parent_id": "1005815",
+                    "hashes": {
+                        "sha1": "b6cc1bedfbd17e2a337bce715c20ccae74ea9dd9",
+                        "md5": "156b1e4de07e26ce6c047ed18628d5e8"
+                    },
+                    "required_dependencies": [],
+                    "size": 275202,
+                    "date_published": "2025-09-20T04:43:12.133Z"
                 }
             ]
         },
@@ -3567,27 +3567,6 @@
             },
             "files": [
                 {
-                    "type": "curseforge",
-                    "file_name": "serene-landscapes.jar",
-                    "mc_versions": [
-                        "1.12.2"
-                    ],
-                    "loaders": [
-                        "forge"
-                    ],
-                    "release_type": "release",
-                    "url": "https://edge.forgecdn.net/files/6909/87/serene-landscapes.jar",
-                    "id": "6909087",
-                    "parent_id": "1296238",
-                    "hashes": {
-                        "sha1": "78f45c2e9ce540d0f0befc3f90fb5c372c7c8632",
-                        "md5": "1e30ac213d7281c9b82f07d2a9044513"
-                    },
-                    "required_dependencies": [],
-                    "size": 2033145,
-                    "date_published": "2025-08-20T21:04:12.990Z"
-                },
-                {
                     "type": "modrinth",
                     "file_name": "serene-landscapes.jar",
                     "mc_versions": [
@@ -3597,16 +3576,37 @@
                         "forge"
                     ],
                     "release_type": "release",
-                    "url": "https://cdn.modrinth.com/data/8Cn1jji3/versions/rbrzdV7p/serene-landscapes.jar",
-                    "id": "rbrzdV7p",
+                    "url": "https://cdn.modrinth.com/data/8Cn1jji3/versions/lOiUpQYp/serene-landscapes.jar",
+                    "id": "lOiUpQYp",
                     "parent_id": "8Cn1jji3",
                     "hashes": {
-                        "sha512": "6d94b7519845809864ae6f77371e7799c5291d73b329912c64bdeb5f70bef286686c99e5ef0205deabb1f286a878ac3d13694270cc4f0f5770426a097aa42581",
-                        "sha1": "78f45c2e9ce540d0f0befc3f90fb5c372c7c8632"
+                        "sha512": "c231d3fc15ccbe0890709d7bbec27ea1017662014c28f7af3303bad93aff8dfb5460736adcf56dec831b0fce75073ec5349d7fd9307523233f91e6daa567af5e",
+                        "sha1": "df82f7cc18ffca97c41f3761a73dd1e5aca8a61e"
                     },
                     "required_dependencies": [],
-                    "size": 2033145,
-                    "date_published": "2025-08-20T21:03:11.254640Z"
+                    "size": 2243397,
+                    "date_published": "2025-09-20T14:37:04.385668Z"
+                },
+                {
+                    "type": "curseforge",
+                    "file_name": "serene-landscapes.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "release",
+                    "url": "https://edge.forgecdn.net/files/7015/434/serene-landscapes.jar",
+                    "id": "7015434",
+                    "parent_id": "1296238",
+                    "hashes": {
+                        "sha1": "df82f7cc18ffca97c41f3761a73dd1e5aca8a61e",
+                        "md5": "92688dd727914af8c186559a789dcb1f"
+                    },
+                    "required_dependencies": [],
+                    "size": 2243397,
+                    "date_published": "2025-09-20T14:36:13.487Z"
                 }
             ]
         },
@@ -3783,7 +3783,7 @@
             "files": [
                 {
                     "type": "curseforge",
-                    "file_name": "OpenTerrainGenerator-1.12.2-v9.6.jar",
+                    "file_name": "OpenTerrainGenerator-1.12.2-v9.7.jar",
                     "mc_versions": [
                         "1.12.2"
                     ],
@@ -3791,16 +3791,16 @@
                         "forge"
                     ],
                     "release_type": "release",
-                    "url": "https://edge.forgecdn.net/files/6764/876/OpenTerrainGenerator-1.12.2-v9.6.jar",
-                    "id": "6764876",
+                    "url": "https://edge.forgecdn.net/files/7004/304/OpenTerrainGenerator-1.12.2-v9.7.jar",
+                    "id": "7004304",
                     "parent_id": "265894",
                     "hashes": {
-                        "sha1": "9e198ebafb726d01663a7a3e5dad66c2c6d93ab8",
-                        "md5": "33840e781751c358bd206ee439031680"
+                        "sha1": "d3aa6998832c1d115b8c2397f0b8c33288642c9e",
+                        "md5": "4d9e8fdb5f6c1b43d88790a28817c8fc"
                     },
                     "required_dependencies": [],
-                    "size": 4563073,
-                    "date_published": "2025-07-13T17:04:34.687Z"
+                    "size": 4563471,
+                    "date_published": "2025-09-16T21:54:08.837Z"
                 }
             ]
         },
@@ -4373,33 +4373,8 @@
             },
             "files": [
                 {
-                    "type": "curseforge",
-                    "file_name": "sussypatches-1.4.2.jar",
-                    "mc_versions": [
-                        "1.12.2"
-                    ],
-                    "loaders": [
-                        "forge"
-                    ],
-                    "release_type": "beta",
-                    "url": "https://edge.forgecdn.net/files/6918/977/sussypatches-1.4.2.jar",
-                    "id": "6918977",
-                    "parent_id": "1319894",
-                    "hashes": {
-                        "sha1": "c98841061d181b880d9ff285a71f20c958171fe7",
-                        "md5": "43bc7b3d7293a2ab6f3476a9e1bffbb6"
-                    },
-                    "required_dependencies": [
-                        "419286",
-                        "557242",
-                        "870276"
-                    ],
-                    "size": 279271,
-                    "date_published": "2025-08-23T14:50:26.330Z"
-                },
-                {
                     "type": "modrinth",
-                    "file_name": "sussypatches-1.4.2.jar",
+                    "file_name": "sussypatches-1.5.0.jar",
                     "mc_versions": [
                         "1.12.2"
                     ],
@@ -4407,20 +4382,45 @@
                         "forge"
                     ],
                     "release_type": "beta",
-                    "url": "https://cdn.modrinth.com/data/34XRY2VK/versions/BUJdChGJ/sussypatches-1.4.2.jar",
-                    "id": "BUJdChGJ",
+                    "url": "https://cdn.modrinth.com/data/34XRY2VK/versions/C3sMtvdA/sussypatches-1.5.0.jar",
+                    "id": "C3sMtvdA",
                     "parent_id": "34XRY2VK",
                     "hashes": {
-                        "sha512": "1b877d967c7aeaeee4012aaab47d2bfd3f268ee223a09f3cdcc5d01e798186bbe1cf322955334b97c30127fa2a5b9a470e1ddc54095537d2335dc475c78efc22",
-                        "sha1": "c98841061d181b880d9ff285a71f20c958171fe7"
+                        "sha512": "4d7ffee9b1698627aa356f3a8de1ea22d91ac28521605bdce9bc0a99412c650fe68ef68a633bcb242fc7b16853737b966870f1602fca69900c95cfefa6f35b72",
+                        "sha1": "f964fb423b5023108f97b9ec7c1ad43909687d99"
                     },
                     "required_dependencies": [
-                        "G1ckZuWK",
+                        "Bnsrfd1o",
                         "tULldUx4",
-                        "Bnsrfd1o"
+                        "G1ckZuWK"
                     ],
-                    "size": 279271,
-                    "date_published": "2025-08-23T14:50:33.621723Z"
+                    "size": 318721,
+                    "date_published": "2025-09-16T04:17:01.511628Z"
+                },
+                {
+                    "type": "curseforge",
+                    "file_name": "sussypatches-1.5.0.jar",
+                    "mc_versions": [
+                        "1.12.2"
+                    ],
+                    "loaders": [
+                        "forge"
+                    ],
+                    "release_type": "beta",
+                    "url": "https://edge.forgecdn.net/files/7001/792/sussypatches-1.5.0.jar",
+                    "id": "7001792",
+                    "parent_id": "1319894",
+                    "hashes": {
+                        "sha1": "f964fb423b5023108f97b9ec7c1ad43909687d99",
+                        "md5": "6626487f5ae8f5f0994a7d860b2cd938"
+                    },
+                    "required_dependencies": [
+                        "557242",
+                        "870276",
+                        "419286"
+                    ],
+                    "size": 318721,
+                    "date_published": "2025-09-16T04:16:51.253Z"
                 }
             ]
         },
